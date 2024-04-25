@@ -1,8 +1,7 @@
 {
-  "name": "bacalah",
+  "name": "tuturbaca",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "version": "1.0.0",
   "scripts": {
     "build": "vite build",
     "preview": "vite preview",
