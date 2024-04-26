@@ -46,16 +46,6 @@ export default function App() {
   });
   const [fontSize, setFontSize] = useState(DEFAULT_FONT_SIZE); // em
 
-  // test data
-  useEffect(() => {
-    setTimeout(() => {
-      let text = "Usia perangkap kita, remaja kita tinggalkan.";
-      setHasResult(true);
-      setResultText(text);
-      sessionStorage.setItem("resultText", text);
-    }, 300);
-  }, []);
-
   useEffect(() => {
     if (!recordingBlob) return;
     uploadFile(recordingBlob);
