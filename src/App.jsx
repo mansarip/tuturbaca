@@ -233,13 +233,18 @@ export default function App() {
             membaca daripada pertuturan mereka sendiri.
           </p>
           <p>
-            Oleh{" "}
+            Browser terbaik setakat ini Google Chrome. Firefox ada masalah
+            delay. Safari rakaman tak jadi apa. Oleh{" "}
             <a
               target="_blank"
               href="https://facebook.com/luqmanrasa"
               className="underline"
             >
               Luqman B. Shariffudin
+            </a>{" "}
+            &#183; Source code:{" "}
+            <a href="https://github.com/mansarip/tuturbaca" target="_blank" className="underline">
+              Github
             </a>
           </p>
         </div>
