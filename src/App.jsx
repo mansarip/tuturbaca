@@ -100,9 +100,9 @@ export default function App() {
   }
 
   return (
-    <div className="absolute top-0 left-0 right-0 bottom-0 flex flex-col justify-center items-center">
-      <div className="w-[1200px] z-10">
-        <div className="h-[800px] bg-white shadow-xl rounded-2xl border-8 border-stone-700 flex flex-col">
+    <>
+      <div className="flex flex-col z-10 h-dvh px-44 py-20 z-10 relative">
+        <div className="flex-1 bg-white shadow-xl rounded-2xl border-8 border-stone-700 flex flex-col overflow-auto">
           <div className="flex-1 flex overflow-hidden">
             <div
               className="font-bold leading-[1.2em] text-left overflow-y-auto p-5 px-10 result flex-1 rounded-t-2xl"
@@ -126,12 +126,16 @@ export default function App() {
               )}
 
               {!isEditMode && !hasResult && (
-                <div className="flex items-center justify-center flex-1 flex-col text-center select-none">
-                  <img src="/kid_mic.png" draggable={false} />
-                  <LabelTengah
-                    isRecording={isRecording}
-                    isProcessing={isProcessing}
-                  />
+                <div className="flex items-center justify-center text-left select-none h-[100%]">
+                  <div className="aspect-auto flex-1 flex justify-end">
+                    <img src="/kid_mic.png" draggable={false} />
+                  </div>
+                  <div className="flex-1 flex justify-start">
+                    <LabelTengah
+                      isRecording={isRecording}
+                      isProcessing={isProcessing}
+                    />
+                  </div>
                 </div>
               )}
             </div>
@@ -241,7 +245,7 @@ export default function App() {
         </div>
       </div>
       <div className="z-0 absolute top-0 left-0 right-0 bottom-0 bg-[url('/bg.webp')] bg-no-repeat bg-cover bg-bottom opacity-20"></div>
-    </div>
+    </>
   );
 }
 
@@ -289,8 +293,8 @@ function Button({
 function LabelTengah({ isRecording, isProcessing }) {
   if (isRecording) {
     return (
-      <div>
-        <div className="text-3xl pb-5">Merakam suara...</div>
+      <div className="leading-tight">
+        <div className="text-5xl pb-5">Merakam suara...</div>
         <div className="loader"></div>
       </div>
     );
@@ -298,15 +302,19 @@ function LabelTengah({ isRecording, isProcessing }) {
 
   if (!isRecording && isProcessing) {
     return (
-      <div>
-        <div className="text-3xl pb-5">Memproses rakaman, sila tunggu...</div>
+      <div className="leading-tight">
+        <div className="text-5xl pb-5">
+          Memproses rakaman,
+          <br />
+          sila tunggu...
+        </div>
         <div className="loader process"></div>
       </div>
     );
   }
 
   return (
-    <span className="text-3xl">
+    <span className="text-5xl leading-tight">
       Mulakan dengan
       <br />
       merakam suara anda!
