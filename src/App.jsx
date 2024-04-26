@@ -1,16 +1,12 @@
 /**
  * "Jejak ku tinggalkan untuk kau teruskan, bangkitkanku dalam perjuanganmu."
  */
+import { useAudioRecorder } from "react-audio-voice-recorder";
 import { HiCursorClick } from "react-icons/hi";
 import { RiFocus3Fill } from "react-icons/ri";
-import { useAudioRecorder } from "react-audio-voice-recorder";
-import { FaStopCircle } from "react-icons/fa";
-import { FaMicrophone } from "react-icons/fa";
-import { TiRefresh } from "react-icons/ti";
-import { TiPencil } from "react-icons/ti";
-import { FaCheck } from "react-icons/fa";
-
-import useCountDown from "react-countdown-hook";
+import { FaCheck, FaStopCircle, FaMicrophone } from "react-icons/fa";
+import { TiRefresh, TiPencil } from "react-icons/ti";
+import { BiSolidMessageError } from "react-icons/bi";
 import cn from "classnames";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -28,8 +24,19 @@ export default function App() {
   const [resultText, setResultText] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [timeLeft, { start: startCountdown, reset: resetCountdown }] = useCountDown(MAX_SECOND * 1000, 1000); // prettier-ignore
-  const { startRecording, stopRecording, recordingBlob, isRecording } = useAudioRecorder(); // prettier-ignore
+  const [errMessage, setErrMessage] = useState(""); // kalau ada isi, maksudnya dialog akan show
+  const {
+    startRecording,
+    stopRecording,
+    recordingBlob,
+    isRecording,
+    recordingTime,
+  } = useAudioRecorder(null, () => {
+    reset();
+    setErrMessage(
+      "Sila pastikan anda mempunyai mikrofon, dan laman ini diberi kebenaran untuk mengakses mikrofon anda."
+    );
+  });
   const [fontSize, setFontSize] = useState(DEFAULT_FONT_SIZE); // em
 
   useEffect(() => {
@@ -44,12 +51,20 @@ export default function App() {
 
   useEffect(() => {
     if (isRecording) {
-      let remaining = timeLeft / 1000;
+      let remaining = MAX_SECOND - recordingTime;
       if (remaining <= 0) {
         stopRecord();
       }
     }
-  }, [isRecording, timeLeft]);
+  }, [isRecording, recordingTime]);
+
+  useEffect(() => {
+    if (errMessage !== "") {
+      document.getElementById("errorDialog").showModal();
+    } else {
+      document.getElementById("errorDialog").close();
+    }
+  }, [errMessage]);
 
   async function uploadFile(file) {
     try {
@@ -66,22 +81,18 @@ export default function App() {
       setHasResult(true);
       setIsProcessing(false);
     } catch (e) {
-      alert(e?.response?.data || e?.message);
+      setErrMessage(e?.response?.data || e?.message);
       reset();
     }
   }
 
   function startRecord() {
-    startCountdown();
     startRecording();
   }
 
   function stopRecord() {
     stopRecording();
     setIsProcessing(true);
-    setTimeout(() => {
-      resetCountdown();
-    }, 300);
   }
 
   function toggleHoverMode() {
@@ -148,7 +159,8 @@ export default function App() {
                   Berhenti
                 </Button>
                 <div className="flex items-center font-bold text-xl text-red-700 pl-5">
-                  ...berbaki {timeLeft / 1000} saat (atau tekan Berhenti)
+                  ...berbaki {MAX_SECOND - recordingTime} saat (atau tekan
+                  Berhenti)
                 </div>
               </>
             )}
@@ -243,13 +255,39 @@ export default function App() {
               Luqman B. Shariffudin
             </a>{" "}
             &#183; Source code:{" "}
-            <a href="https://github.com/mansarip/tuturbaca" target="_blank" className="underline">
+            <a
+              href="https://github.com/mansarip/tuturbaca"
+              target="_blank"
+              className="underline"
+            >
               Github
             </a>
           </p>
         </div>
       </div>
       <div className="z-0 absolute top-0 left-0 right-0 bottom-0 bg-[url('/bg.webp')] bg-no-repeat bg-cover bg-bottom opacity-20"></div>
+
+      {/* onCancel diperlukan untuk handle ESC key */}
+      <dialog
+        id="errorDialog"
+        onCancel={() => setErrMessage("")}
+        className="relative bg-white px-5 py-4 rounded-lg shadow-xl border-4 border-red-500 max-w-[500px] select-none"
+      >
+        <div className="flex items-center gap-5">
+          <div>
+            <BiSolidMessageError size={60} color="red" />
+          </div>
+          <div className="font-semibold text-2xl">{errMessage}</div>
+        </div>
+        <div className="flex justify-end border-t-4 border-stone-200 mt-3 pt-3">
+          <button
+            className="bg-stone-100 px-5 py-2 border-4 border-stone-400 rounded-lg font-bold"
+            onClick={() => setErrMessage("")}
+          >
+            Tutup
+          </button>
+        </div>
+      </dialog>
     </>
   );
 }
@@ -356,7 +394,8 @@ function ResultText({ mode, resultText = "", focusMode }) {
 
 function isAudioSilent(audioBlob) {
   return new Promise((resolve, reject) => {
-    const audioContext = new window.AudioContext();
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioContext = new AudioContext();
     const reader = new FileReader();
 
     reader.onload = function (event) {

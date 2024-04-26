@@ -44,6 +44,10 @@ div.button:disabled {
   color: orange;
   background: black;
 }
+::backdrop {
+  background-color: #333;
+  opacity: 0.3;
+}
 .result {
   background-color: #fff;
   opacity: 0.8;
