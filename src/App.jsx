@@ -150,6 +150,11 @@ export default function App() {
     sessionStorage.removeItem(SS_KEY_TEXT);
   }
 
+  function commitEdit() {
+    sessionStorage.setItem(SS_KEY_TEXT, resultText);
+    setIsEditMode(false);
+  }
+
   return (
     <>
       <div className="flex flex-col z-10 h-dvh px-44 py-20 z-10 relative">
@@ -260,7 +265,7 @@ export default function App() {
             </Button>
 
             {isEditMode ? (
-              <Button variant="green" onClick={() => setIsEditMode(false)}>
+              <Button variant="green" onClick={commitEdit}>
                 <FaCheck size={35} />
               </Button>
             ) : (
@@ -345,6 +350,10 @@ function Button({
   const classPrefix =
     "button px-5 h-16 select-none transition-all duration-150";
 
+  // haaa baru kau tahu macam ni lah dia kalau guna tailwind.
+  // kita tak boleh nak jadikan dia dynamic (pecah-pecah sebahagian perkataan class)
+  // sebab ia tidak akan dibawa masuk (build) secara betul nanti
+  // rujuk: https://tailwindcss.com/docs/content-configuration#dynamic-class-names
   const colorVariants = {
     blue: "active:translate-y-2 bg-blue-500 active:border-b-[0px] active:[box-shadow:0_0px_0_0_#1b6ff8,0_0px_0_0_#1b70f841] [box-shadow:0_10px_0_0_#1b6ff8,0_15px_0_0_#1b70f841] border-b-[1px] border-blue-400 hover:bg-gradient-to-b from-cyan-500 to-blue-500",
     red: "active:translate-y-2 bg-red-500 active:border-b-[0px] active:[box-shadow:0_0px_0_0_#f80032,0_0px_0_0_#f8260841] [box-shadow:0_10px_0_0_#f80032,0_15px_0_0_#f8260841] border-b-[1px] border-red-400 hover:bg-gradient-to-b from-orange-500 to-red-500",
