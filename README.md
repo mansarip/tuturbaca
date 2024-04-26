@@ -36,10 +36,14 @@ Dengan cara ini, dia akan memahami bahawa apa yang dia tuturkan sebenarnya dieja
 
 ## Limitasi
 
-|               | Mobile       | Chrome | Firefox            | Safari |
-| ------------- | ------------ | ------ | ------------------ | ------ |
-| Paparan       | ⚠️Tak sesuai | ✅ OK  | ✅ OK              | ✅ OK  |
-| Rakaman Suara | Bergantung   | ✅ OK  | ⁉️ Ada delay start | ❌ Tak Jadi  |
+Browser:
+
+|               | Mobile       | Chrome | Firefox            | Safari      |
+| ------------- | ------------ | ------ | ------------------ | ----------- |
+| Paparan       | ⚠️Tak sesuai | ✅ OK  | ✅ OK              | ✅ OK       |
+| Rakaman Suara | Bergantung   | ✅ OK  | ⁉️ Ada delay start | ❌ Tak Jadi |
+
+Antara limitasi lain adalah bagaimana cara WhisperAPI kendali input suara yang tidak tentu. Boleh jadi input dari user dalam bentuk senyap atau bercakap yang bukan-bukan (_gibberish_). Jika ini berlaku, teks yang dihasilkan mungkin salah dan langsung tidak kena / halusinasi.
 
 <!-- TOC --><a name="development"></a>
 
@@ -56,9 +60,10 @@ Jadi saya memilih untuk teruskan dengan OpenAI (produk yang berkaitan untuk ini 
 ### Stack
 
 - React
-- Tailwind CSS
+- Tailwind CSS (masih ada juga guna .css biasa)
 - Vite
 - Hono (untuk back-end server)
+- Bun
 
 <!-- TOC --><a name="ui-ux"></a>
 
@@ -73,6 +78,16 @@ Dari segi grafik, saya mengambil ilham dari pelbagai sumber dari Pinterest denga
 Pemilihan jenis font pula dipengaruhi oleh reka bentuk huruf "a" kecil. Saya lebih cenderong untuk perkenalkan kepada anak-anak bentuk "a" yang bulat berbanding "a" yang bersimpul.
 
 Ini kerana bagi saya, sebahagian mereka ada kekeliruan bila mana lihat huruf yang sama tapi bentuk berbeza. Dan ada yang teragak-agak (tidak yakin) bila baca kerana keliru.
+
+#### Native Elements
+
+*Native elements* yang menarik yang telah diubah penampilannya dalam projek ini adalah; *scrollbar*, *cursor*, *selection-highlight*, *slider*:
+
+![Native elements](/docs/elements.png)
+
+Dialog yang digunakan dalam projek ini adalah dialog *native html* `<dialog>` yang mana telah diubah penampilannya, sebagai contoh:
+
+![Native dialog](/docs/dialog.png)
 
 <!-- TOC --><a name="flow-speech-to-text"></a>
 
