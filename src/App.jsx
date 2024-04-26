@@ -7,15 +7,23 @@ import { RiFocus3Fill } from "react-icons/ri";
 import { FaCheck, FaStopCircle, FaMicrophone } from "react-icons/fa";
 import { TiRefresh, TiPencil } from "react-icons/ti";
 import { BiSolidMessageError } from "react-icons/bi";
+import { IoText } from "react-icons/io5";
 import cn from "classnames";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import capitalize from "capitalize";
 
+const ORIGINAL = "ORIGINAL";
+const LOWER = "LOWER";
+const UPPER = "UPPER";
+const CAPITALIZE = "CAPITALIZE";
 const WORD = "WORD";
 const CHAR = "CHAR";
 const MAX_SECOND = 15;
 const SILENT_THRESHOLD = 0.1;
 const DEFAULT_FONT_SIZE = 4.7;
+const MIC_ERR_MESSAGE = "Sila pastikan anda mempunyai mikrofon, dan laman ini diberi kebenaran untuk mengakses mikrofon anda."; // prettier-ignore
+const CASE_MODE = [ORIGINAL, LOWER, UPPER, CAPITALIZE];
 
 export default function App() {
   const [hoverMode, setHoverMode] = useState(WORD);
@@ -24,6 +32,7 @@ export default function App() {
   const [resultText, setResultText] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [caseMode, setCaseMode] = useState(ORIGINAL);
   const [errMessage, setErrMessage] = useState(""); // kalau ada isi, maksudnya dialog akan show
   const {
     startRecording,
@@ -33,11 +42,19 @@ export default function App() {
     recordingTime,
   } = useAudioRecorder(null, () => {
     reset();
-    setErrMessage(
-      "Sila pastikan anda mempunyai mikrofon, dan laman ini diberi kebenaran untuk mengakses mikrofon anda."
-    );
+    setErrMessage(MIC_ERR_MESSAGE);
   });
   const [fontSize, setFontSize] = useState(DEFAULT_FONT_SIZE); // em
+
+  // test data
+  useEffect(() => {
+    setTimeout(() => {
+      let text = "Usia perangkap kita, remaja kita tinggalkan.";
+      setHasResult(true);
+      setResultText(text);
+      sessionStorage.setItem("resultText", text);
+    }, 300);
+  }, []);
 
   useEffect(() => {
     if (!recordingBlob) return;
@@ -65,6 +82,36 @@ export default function App() {
       document.getElementById("errorDialog").close();
     }
   }, [errMessage]);
+
+  useEffect(() => {
+    let text = "";
+    if (caseMode === ORIGINAL) {
+      text = sessionStorage.getItem("resultText");
+    } else if (caseMode === LOWER) {
+      text = resultText.toLowerCase();
+    } else if (caseMode === UPPER) {
+      text = resultText.toUpperCase();
+    } else if (caseMode === CAPITALIZE) {
+      text = capitalize.words(resultText);
+    }
+    setResultText(text);
+  }, [caseMode]);
+
+  function toggleCase() {
+    // let newMode = caseMode + 1;
+    // if (newMode > 3) {
+    //   newMode = 0;
+    // }
+    // setCaseMode(newMode);
+
+    let index = CASE_MODE.findIndex((v) => v === caseMode);
+    let newMode = index + 1;
+    if (newMode > 3) {
+      newMode = 0;
+    }
+
+    setCaseMode(CASE_MODE[newMode]);
+  }
 
   async function uploadFile(file) {
     try {
@@ -208,12 +255,15 @@ export default function App() {
               </div>
             </Button>
 
+            <Button onClick={toggleCase} disabled={!hasResult || isEditMode}>
+              <IoText size={25} />
+            </Button>
+
             <Button
               onClick={() => setFocusMode(!focusMode)}
               disabled={!hasResult || isEditMode}
             >
               <RiFocus3Fill size={25} />
-              Kelabu
             </Button>
 
             {isEditMode ? (
