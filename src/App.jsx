@@ -24,6 +24,7 @@ const SILENT_THRESHOLD = 0.1;
 const DEFAULT_FONT_SIZE = 4.7;
 const MIC_ERR_MESSAGE = "Sila pastikan anda mempunyai mikrofon, dan laman ini diberi kebenaran untuk mengakses mikrofon anda."; // prettier-ignore
 const CASE_MODE = [ORIGINAL, LOWER, UPPER, CAPITALIZE];
+const SS_KEY_TEXT = "resultText";
 
 export default function App() {
   const [hoverMode, setHoverMode] = useState(WORD);
@@ -73,34 +74,33 @@ export default function App() {
     }
   }, [errMessage]);
 
-  useEffect(() => {
-    let text = "";
-    if (caseMode === ORIGINAL) {
-      text = sessionStorage.getItem("resultText");
-    } else if (caseMode === LOWER) {
-      text = resultText.toLowerCase();
-    } else if (caseMode === UPPER) {
-      text = resultText.toUpperCase();
-    } else if (caseMode === CAPITALIZE) {
-      text = capitalize.words(resultText);
-    }
-    setResultText(text);
-  }, [caseMode]);
-
   function toggleCase() {
-    // let newMode = caseMode + 1;
-    // if (newMode > 3) {
-    //   newMode = 0;
-    // }
-    // setCaseMode(newMode);
+    try {
+      let index = CASE_MODE.findIndex((v) => v === caseMode);
+      let newIndex = index + 1;
+      if (newIndex > 3) {
+        newIndex = 0;
+      }
+      let newMode = CASE_MODE[newIndex];
 
-    let index = CASE_MODE.findIndex((v) => v === caseMode);
-    let newMode = index + 1;
-    if (newMode > 3) {
-      newMode = 0;
+      let text = "";
+      if (newMode === ORIGINAL) {
+        text = sessionStorage.getItem(SS_KEY_TEXT);
+      } else if (newMode === LOWER) {
+        text = resultText.toLowerCase();
+      } else if (newMode === UPPER) {
+        text = resultText.toUpperCase();
+      } else if (newMode === CAPITALIZE) {
+        text = capitalize.words(resultText);
+      }
+
+      setCaseMode(newMode);
+      setResultText(text);
+    } catch (error) {
+      // kalau apa-apa jadi, fallback ke original
+      setCaseMode(ORIGINAL);
+      setResultText(sessionStorage.getItem(SS_KEY_TEXT));
     }
-
-    setCaseMode(CASE_MODE[newMode]);
   }
 
   async function uploadFile(file) {
@@ -114,9 +114,11 @@ export default function App() {
       formData.append("file", file, "audio.mp4");
 
       let res = await axios.post("/api/upload", formData);
-      setResultText(res?.data ?? "");
+      let result = res?.data ?? "";
+      setResultText(result);
       setHasResult(true);
       setIsProcessing(false);
+      sessionStorage.setItem(SS_KEY_TEXT, result);
     } catch (e) {
       setErrMessage(e?.response?.data || e?.message);
       reset();
@@ -145,6 +147,7 @@ export default function App() {
     setResultText("");
     setIsProcessing(false);
     setFontSize(DEFAULT_FONT_SIZE);
+    sessionStorage.removeItem(SS_KEY_TEXT);
   }
 
   return (
